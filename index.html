@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EmailAuto — Outreach Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--bg2:#161b27;--bg3:#1e2535;--bg4:#252d40;
+  --border:#2a3350;--border2:#3a4570;
+  --text:#e8eaf0;--text2:#8892a4;--text3:#5a6480;
+  --blue:#3b82f6;--blue2:#1d4ed8;--blue-bg:#1e3a5f;
+  --green:#22c55e;--green-bg:#14532d;
+  --amber:#f59e0b;--amber-bg:#451a03;
+  --red:#ef4444;--red-bg:#450a0a;
+  --purple:#a855f7;--purple-bg:#2e1065;
+  --radius:10px;--radius-lg:14px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* NAV */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:60px;background:var(--bg2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:600;color:var(--text)}
+.logo i{font-size:22px;color:var(--blue)}
+.nav-tabs{display:flex;gap:2px}
+.tab{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text2);transition:all .15s}
+.tab:hover{background:var(--bg3);color:var(--text)}
+.tab.active{background:var(--bg3);color:var(--text)}
+.gmail-pill{display:flex;align-items:center;gap:7px;padding:8px 16px;border-radius:99px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:none;color:var(--text2);transition:all .15s}
+.gmail-pill:hover{border-color:var(--blue);color:var(--blue)}
+.gmail-pill.on{border-color:var(--green);color:var(--green);background:rgba(34,197,94,.08)}
+.gmail-pill i{font-size:16px}
+
+/* PAGES */
+.page{display:none;padding:32px 28px;max-width:1200px}
+.page.active{display:block}
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px}
+.page-title{font-size:26px;font-weight:600;color:var(--text)}
+.page-sub{font-size:14px;color:var(--text2);margin-top:4px}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;border-radius:var(--radius);font-size:13px;font-weight:500;cursor:pointer;border:none;transition:all .15s;font-family:'DM Sans',sans-serif}
+.btn-blue{background:var(--blue);color:#fff}.btn-blue:hover{background:var(--blue2)}
+.btn-green{background:#16a34a;color:#fff}.btn-green:hover{background:#15803d}
+.btn-orange{background:#ea580c;color:#fff}.btn-orange:hover{background:#c2410c}
+.btn-ghost{background:var(--bg3);color:var(--text);border:1px solid var(--border)}.btn-ghost:hover{background:var(--bg4)}
+.btn-sm{padding:6px 14px;font-size:12px}
+
+/* STATS GRID */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin-bottom:28px}
+.stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px}
+.stat-lbl{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.stat-val{font-size:32px;font-weight:600;color:var(--text)}
+.stat-sub{font-size:12px;color:var(--text2);margin-top:6px}
+.val-blue{color:var(--blue)}.val-green{color:var(--green)}.val-amber{color:var(--amber)}.val-purple{color:var(--purple)}
+
+/* CARD */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:20px}
+.card-head{display:flex;align-items:center;justify-content:space-between;padding:16px 22px;border-bottom:1px solid var(--border)}
+.card-title{font-size:14px;font-weight:600;color:var(--text)}
+.card-body{padding:22px}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{padding:11px 18px;text-align:left;font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;border-bottom:1px solid var(--border);background:var(--bg3)}
+td{padding:13px 18px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600}
+.b-gray{background:var(--bg4);color:var(--text2)}
+.b-blue{background:var(--blue-bg);color:#93c5fd}
+.b-green{background:var(--green-bg);color:#86efac}
+.b-amber{background:var(--amber-bg);color:#fcd34d}
+.b-red{background:var(--red-bg);color:#fca5a5}
+
+/* PROGRESS */
+.bar{height:6px;background:var(--bg4);border-radius:99px;overflow:hidden;min-width:80px}
+.bar-fill{height:100%;border-radius:99px;background:var(--blue);transition:width .6s}
+.bar-fill.green{background:var(--green)}
+
+/* FORM */
+.form-group{margin-bottom:18px}
+.label{display:block;font-size:13px;font-weight:500;color:var(--text);margin-bottom:7px}
+.hint{font-size:11px;color:var(--text3);margin-top:5px}
+input[type=text],input[type=email],select,textarea{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--radius);font-size:13px;background:var(--bg3);color:var(--text);font-family:'DM Sans',sans-serif;transition:border .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue)}
+textarea{min-height:150px;resize:vertical;font-family:'DM Mono',monospace;line-height:1.6}
+select option{background:var(--bg3)}
+
+/* UPLOAD ZONE */
+.upload-zone{border:2px dashed var(--border2);border-radius:var(--radius-lg);padding:44px 24px;text-align:center;cursor:pointer;background:var(--bg3);transition:all .2s}
+.upload-zone:hover{border-color:var(--blue);background:rgba(59,130,246,.05)}
+.upload-zone i{font-size:40px;color:var(--text3);margin-bottom:14px;display:block}
+.upload-zone p{font-size:15px;font-weight:500;color:var(--text)}
+.upload-zone small{font-size:12px;color:var(--text3)}
+input[type=file]{display:none}
+
+/* CAMPAIGN CARDS */
+.c-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-bottom:24px}
+.c-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px;cursor:pointer;transition:all .15s}
+.c-card:hover{border-color:var(--blue);transform:translateY(-1px)}
+.c-card-name{font-size:15px;font-weight:600;color:var(--text);margin-bottom:5px}
+.c-card-subj{font-size:12px;color:var(--text2);margin-bottom:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.c-stats{display:flex;gap:18px;padding-top:14px;border-top:1px solid var(--border)}
+.cs{text-align:center}
+.cs-val{font-size:20px;font-weight:600;color:var(--text)}
+.cs-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-top:2px}
+
+/* EMPTY */
+.empty{text-align:center;padding:56px 24px;color:var(--text3)}
+.empty i{font-size:44px;margin-bottom:14px;display:block}
+.empty p{font-size:14px}
+
+/* TOAST */
+.toast{position:fixed;bottom:28px;right:28px;background:#1e293b;color:#e2e8f0;border:1px solid var(--border2);padding:13px 22px;border-radius:var(--radius);font-size:13px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:999;max-width:320px}
+.toast.show{opacity:1}
+
+/* CODE BLOCK */
+code{display:block;background:var(--bg3);border:1px solid var(--border);padding:14px 16px;border-radius:var(--radius);font-family:'DM Mono',monospace;font-size:12px;color:#86efac;line-height:1.7}
+
+/* ACTIONS ROW */
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+
+/* PREVIEW SECTION */
+.preview-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-lg);padding:22px;margin-top:16px}
+.preview-meta{margin-bottom:16px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.meta-row{display:flex;gap:12px;margin-bottom:8px;font-size:13px}
+.meta-key{color:var(--text3);min-width:60px;font-weight:500}
+.meta-val{color:var(--text)}
+.email-body{font-size:14px;color:var(--text);white-space:pre-wrap;line-height:1.8;font-family:'DM Mono',monospace}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="logo">
+    <i class="ti ti-send-2"></i>
+    EmailAuto
+  </div>
+  <div class="nav-tabs">
+    <button class="tab active" onclick="showPage('dashboard')"><i class="ti ti-dashboard"></i> Dashboard</button>
+    <button class="tab" onclick="showPage('campaigns')"><i class="ti ti-mail"></i> Campaigns</button>
+    <button class="tab" onclick="showPage('new')"><i class="ti ti-plus"></i> New</button>
+    <button class="tab" onclick="showPage('upload')"><i class="ti ti-upload"></i> Upload CSV</button>
+    <button class="tab" onclick="showPage('tracking')"><i class="ti ti-chart-bar"></i> Tracking</button>
+  </div>
+  <button class="gmail-pill" id="gmailBtn" onclick="connectGmail()">
+    <i class="ti ti-brand-gmail"></i>
+    <span id="gmailLabel">Connect Gmail</span>
+  </button>
+</nav>
+
+<!-- DASHBOARD -->
+<div id="page-dashboard" class="page active">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub">Your email outreach analytics</div>
+    </div>
+    <button class="btn btn-blue" onclick="showPage('new')"><i class="ti ti-plus"></i> New Campaign</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-lbl">Campaigns</div><div class="stat-val" id="d-campaigns">0</div><div class="stat-sub">total created</div></div>
+    <div class="stat"><div class="stat-lbl">Recipients</div><div class="stat-val val-blue" id="d-recipients">0</div><div class="stat-sub">total contacts</div></div>
+    <div class="stat"><div class="stat-lbl">Emails Sent</div><div class="stat-val val-purple" id="d-sent">0</div><div class="stat-sub">delivered</div></div>
+    <div class="stat"><div class="stat-lbl">Opened</div><div class="stat-val val-green" id="d-opened">0</div><div class="stat-sub">tracked opens</div></div>
+    <div class="stat"><div class="stat-lbl">Open Rate</div><div class="stat-val val-amber" id="d-rate">0%</div><div class="stat-sub">avg all campaigns</div></div>
+  </div>
+  <div class="card">
+    <div class="card-head"><span class="card-title">Campaign Performance</span><button class="btn btn-ghost btn-sm" onclick="showPage('campaigns')">View all <i class="ti ti-arrow-right"></i></button></div>
+    <table><thead><tr><th>Campaign</th><th>Sent</th><th>Opened</th><th>Open Rate</th><th>Retargeted</th><th>Status</th><th></th></tr></thead>
+    <tbody id="d-table"><tr><td colspan="7"><div class="empty"><i class="ti ti-inbox"></i><p>No campaigns yet — create one to start!</p></div></td></tr></tbody></table>
+  </div>
+</div>
+
+<!-- CAMPAIGNS -->
+<div id="page-campaigns" class="page">
+  <div class="page-header">
+    <div><div class="page-title">Campaigns</div><div class="page-sub">All your email campaigns</div></div>
+    <button class="btn btn-blue" onclick="showPage('new')"><i class="ti ti-plus"></i> New Campaign</button>
+  </div>
+  <div class="c-grid" id="c-grid"><div class="empty" style="grid-column:1/-1"><i class="ti ti-mail-off"></i><p>No campaigns yet.</p></div></div>
+</div>
+
+<!-- NEW CAMPAIGN -->
+<div id="page-new" class="page">
+  <div class="page-header">
+    <div><div class="page-title">New Campaign</div><div class="page-sub">Write your outreach email template</div></div>
+  </div>
+  <div class="card" style="max-width:700px">
+    <div class="card-body">
+      <div class="form-group"><label class="label">Campaign name</label><input type="text" id="c-name" placeholder="e.g. Q2 Ecommerce Outreach"></div>
+      <div class="form-group"><label class="label">Email subject</label><input type="text" id="c-subject" placeholder="e.g. Quick idea for your Shopify store"></div>
+      <div class="form-group">
+        <label class="label">Email body</label>
+        <textarea id="c-body" placeholder="Hi {{name}},
+
+I help ecommerce brands improve conversions by 25-40%.
+
+I noticed your store and spotted some quick wins:
+- Cart abandonment recovery
+- Checkout flow optimization  
+- Mobile UX improvements
+
+Would you be open to a quick 15-min call?
+
+Best,
+Your Name"></textarea>
+        <div class="hint">Use {{name}} to personalize per recipient</div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-blue" onclick="createCampaign()"><i class="ti ti-check"></i> Create Campaign</button>
+        <button class="btn btn-ghost" onclick="showPage('campaigns')">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- UPLOAD CSV -->
+<div id="page-upload" class="page">
+  <div class="page-header">
+    <div><div class="page-title">Upload Recipients</div><div class="page-sub">Import contacts from CSV into a campaign</div></div>
+  </div>
+  <div style="max-width:700px">
+    <div class="card">
+      <div class="card-body">
+        <div class="form-group">
+          <label class="label">Select campaign</label>
+          <select id="up-campaign"><option value="">-- Choose a campaign --</option></select>
+        </div>
+        <label class="upload-zone" for="csv-input">
+          <i class="ti ti-file-upload"></i>
+          <p id="upload-label">Click to upload your CSV file</p>
+          <small>Required columns: email, name</small>
+        </label>
+        <input type="file" id="csv-input" accept=".csv,.txt" onchange="readCSV(event)">
+        <div id="csv-result" style="display:none;margin-top:20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+            <span style="font-size:13px;color:var(--text2)" id="csv-count"></span>
+            <button class="btn btn-blue btn-sm" onclick="importNow()"><i class="ti ti-upload"></i> Import to Campaign</button>
+          </div>
+          <table id="csv-preview-table"><thead><tr id="csv-head"></tr></thead><tbody id="csv-body"></tbody></table>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">CSV format</span></div>
+      <div class="card-body">
+        <p style="font-size:13px;color:var(--text2);margin-bottom:12px">Your CSV needs these columns (first row = headers):</p>
+        <code>email,name
+john@shopify-store.com,John Smith
+sarah@beautyco.io,Sarah Chen
+mike@fitgear.com,Mike Patel
+emma@homeco.store,Emma Williams</code>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TRACKING -->
+<div id="page-tracking" class="page">
+  <div class="page-header">
+    <div><div class="page-title">Tracking & Retargeting</div><div class="page-sub">Monitor opens and retarget unopened emails</div></div>
+  </div>
+  <div style="max-width:280px;margin-bottom:24px">
+    <select id="tr-campaign" onchange="loadTracking()"><option value="">-- Select campaign --</option></select>
+  </div>
+  <div id="tr-content" style="display:none">
+    <div class="stats" style="max-width:680px">
+      <div class="stat"><div class="stat-lbl">Total Sent</div><div class="stat-val val-blue" id="t-sent">0</div></div>
+      <div class="stat"><div class="stat-lbl">Opened</div><div class="stat-val val-green" id="t-opened">0</div></div>
+      <div class="stat"><div class="stat-lbl">Unopened</div><div class="stat-val val-amber" id="t-unopen">0</div></div>
+      <div class="stat"><div class="stat-lbl">Open Rate</div><div class="stat-val val-purple" id="t-rate">0%</div></div>
+    </div>
+    <div class="actions" style="margin-bottom:24px">
+      <button class="btn btn-blue" onclick="doSend()"><i class="ti ti-send"></i> Send Campaign</button>
+      <button class="btn btn-orange" onclick="doRetarget()"><i class="ti ti-refresh"></i> Retarget Unopened</button>
+    </div>
+    <div class="card">
+      <div class="card-head"><span class="card-title">Recipients</span><span id="tr-total" style="font-size:12px;color:var(--text3)"></span></div>
+      <table><thead><tr><th>Name</th><th>Email</th><th>Status</th><th>Sent At</th><th>Opened At</th><th>Retargeted</th></tr></thead>
+      <tbody id="tr-tbody"></tbody></table>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let S={gmail:false,gmailEmail:'',campaigns:[],nextId:1};
+try{const d=localStorage.getItem('ea2');if(d)S=JSON.parse(d);}catch(e){}
+
+const save=()=>{try{localStorage.setItem('ea2',JSON.stringify(S));}catch(e){}};
+const toast=(msg,ms=3000)=>{const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),ms);};
+const $(id)=>document.getElementById(id);
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  $('page-'+id).classList.add('active');
+  const map={dashboard:0,campaigns:1,new:2,upload:3,tracking:4};
+  document.querySelectorAll('.tab')[map[id]]?.classList.add('active');
+  if(id==='dashboard')refreshDash();
+  if(id==='campaigns')refreshCards();
+  if(id==='upload'||id==='tracking')refreshSelects();
+}
+
+function connectGmail(){
+  if(S.gmail){
+    if(!confirm('Disconnect Gmail?'))return;
+    S.gmail=false;S.gmailEmail='';
+    $('gmailBtn').className='gmail-pill';
+    $('gmailLabel').textContent='Connect Gmail';
+    save();toast('Gmail disconnected');return;
+  }
+  const e=prompt('Enter your Gmail address:');
+  if(e&&e.includes('@')){
+    S.gmail=true;S.gmailEmail=e;
+    $('gmailBtn').className='gmail-pill on';
+    $('gmailLabel').textContent=e;
+    save();toast('Gmail connected — ready to send!');
+  }
+}
+
+function createCampaign(){
+  const n=$('c-name').value.trim(),s=$('c-subject').value.trim(),b=$('c-body').value.trim();
+  if(!n)return toast('Enter a campaign name');
+  if(!s)return toast('Enter a subject line');
+  if(!b)return toast('Enter the email body');
+  S.campaigns.push({id:S.nextId++,name:n,subject:s,body:b,status:'draft',recipients:[],createdAt:new Date().toISOString()});
+  save();$('c-name').value='';$('c-subject').value='';$('c-body').value='';
+  toast('Campaign created!');showPage('campaigns');
+}
+
+function refreshDash(){
+  let tR=0,tSent=0,tOpen=0;
+  S.campaigns.forEach(c=>{
+    tR+=c.recipients.length;
+    tSent+=c.recipients.filter(r=>r.status!=='pending').length;
+    tOpen+=c.recipients.filter(r=>r.status==='opened').length;
+  });
+  const rate=tSent>0?Math.round((tOpen/tSent)*100):0;
+  $('d-campaigns').textContent=S.campaigns.length;
+  $('d-recipients').textContent=tR;
+  $('d-sent').textContent=tSent;
+  $('d-opened').textContent=tOpen;
+  $('d-rate').textContent=rate+'%';
+  const tb=$('d-table');
+  if(!S.campaigns.length){tb.innerHTML='<tr><td colspan="7"><div class="empty"><i class="ti ti-inbox"></i><p>No campaigns yet — create one!</p></div></td></tr>';return;}
+  tb.innerHTML=S.campaigns.map(c=>{
+    const sent=c.recipients.filter(r=>r.status!=='pending').length;
+    const opened=c.recipients.filter(r=>r.status==='opened').length;
+    const rate=sent>0?Math.round((opened/sent)*100):0;
+    const ret=c.recipients.filter(r=>r.retargeted).length;
+    const bc=c.status==='sent'?'b-green':c.status==='sending'?'b-blue':'b-gray';
+    return`<tr>
+      <td><strong>${c.name}</strong><br><span style="font-size:11px;color:var(--text3)">${c.subject.slice(0,48)}${c.subject.length>48?'…':''}</span></td>
+      <td>${sent}</td><td style="color:var(--green)">${opened}</td>
+      <td><div style="display:flex;align-items:center;gap:8px"><div class="bar" style="width:70px"><div class="bar-fill green" style="width:${rate}%"></div></div><span style="font-size:12px;font-weight:600">${rate}%</span></div></td>
+      <td>${ret}</td>
+      <td><span class="badge ${bc}">${c.status}</span></td>
+      <td><button class="btn btn-ghost btn-sm" onclick="openTracking(${c.id})">View</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function refreshCards(){
+  const g=$('c-grid');
+  if(!S.campaigns.length){g.innerHTML='<div class="empty" style="grid-column:1/-1"><i class="ti ti-mail-off"></i><p>No campaigns yet.</p></div>';return;}
+  g.innerHTML=S.campaigns.map(c=>{
+    const sent=c.recipients.filter(r=>r.status!=='pending').length;
+    const opened=c.recipients.filter(r=>r.status==='opened').length;
+    const rate=sent>0?Math.round((opened/sent)*100):0;
+    const bc=c.status==='sent'?'b-green':'b-gray';
+    return`<div class="c-card" onclick="openTracking(${c.id})">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+        <div class="c-card-name">${c.name}</div>
+        <span class="badge ${bc}">${c.status}</span>
+      </div>
+      <div class="c-card-subj">${c.subject}</div>
+      <div class="c-stats">
+        <div class="cs"><div class="cs-val">${c.recipients.length}</div><div class="cs-lbl">Contacts</div></div>
+        <div class="cs"><div class="cs-val" style="color:var(--purple)">${sent}</div><div class="cs-lbl">Sent</div></div>
+        <div class="cs"><div class="cs-val" style="color:var(--green)">${opened}</div><div class="cs-lbl">Opened</div></div>
+        <div class="cs"><div class="cs-val" style="color:var(--amber)">${rate}%</div><div class="cs-lbl">Rate</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function refreshSelects(){
+  const opts='<option value="">-- Choose a campaign --</option>'+S.campaigns.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  $('up-campaign').innerHTML=opts;
+  $('tr-campaign').innerHTML='<option value="">-- Select campaign --</option>'+S.campaigns.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+}
+
+function openTracking(id){
+  showPage('tracking');
+  setTimeout(()=>{$('tr-campaign').value=id;loadTracking();},50);
+}
+
+let csvData=[],csvHdrs=[];
+function readCSV(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    const lines=ev.target.result.trim().split('\n').filter(l=>l.trim());
+    if(lines.length<2)return toast('CSV needs at least header + 1 row');
+    csvHdrs=lines[0].split(',').map(h=>h.trim().toLowerCase().replace(/"/g,''));
+    csvData=lines.slice(1).map(l=>{
+      const v=l.split(',').map(x=>x.trim().replace(/^"|"$/g,''));
+      const o={};csvHdrs.forEach((h,i)=>o[h]=v[i]||'');return o;
+    }).filter(r=>r.email&&r.email.includes('@'));
+    $('csv-count').textContent=csvData.length+' valid contacts found';
+    $('csv-head').innerHTML=csvHdrs.map(h=>`<th>${h}</th>`).join('');
+    $('csv-body').innerHTML=csvData.slice(0,5).map(r=>'<tr>'+csvHdrs.map(h=>`<td>${r[h]||''}</td>`).join('')+'</tr>').join('');
+    $('csv-result').style.display='block';
+    $('upload-label').textContent=file.name+' loaded';
+    toast(csvData.length+' contacts ready to import');
+  };
+  reader.readAsText(file);
+}
+
+function importNow(){
+  const cid=parseInt($('up-campaign').value);
+  if(!cid)return toast('Select a campaign first');
+  if(!csvData.length)return toast('Upload a CSV file first');
+  const c=S.campaigns.find(x=>x.id===cid);if(!c)return;
+  const existing=new Set(c.recipients.map(r=>r.email));
+  let added=0,skip=0;
+  csvData.forEach(row=>{
+    if(!row.email||existing.has(row.email)){skip++;return;}
+    c.recipients.push({email:row.email,name:row.name||row.first_name||'Subscriber',status:'pending',retargeted:false,sentAt:null,openedAt:null});
+    added++;
+  });
+  save();csvData=[];
+  $('csv-result').style.display='none';
+  $('csv-input').value='';
+  $('upload-label').textContent='Click to upload your CSV file';
+  toast(`${added} contacts imported${skip?', '+skip+' duplicates skipped':''}!`);
+}
+
+function loadTracking(){
+  const cid=parseInt($('tr-campaign').value);
+  $('tr-content').style.display=cid?'block':'none';
+  if(!cid)return;
+  const c=S.campaigns.find(x=>x.id===cid);if(!c)return;
+  const sent=c.recipients.filter(r=>r.status!=='pending').length;
+  const opened=c.recipients.filter(r=>r.status==='opened').length;
+  const rate=sent>0?Math.round((opened/sent)*100):0;
+  $('t-sent').textContent=sent;$('t-opened').textContent=opened;
+  $('t-unopen').textContent=sent-opened;$('t-rate').textContent=rate+'%';
+  $('tr-total').textContent=c.recipients.length+' total';
+  $('tr-tbody').innerHTML=c.recipients.length?c.recipients.map(r=>{
+    const bc=r.status==='opened'?'b-green':r.status==='sent'?'b-blue':'b-gray';
+    return`<tr>
+      <td style="font-weight:500">${r.name}</td>
+      <td style="color:var(--text2)">${r.email}</td>
+      <td><span class="badge ${bc}">${r.status}</span></td>
+      <td style="font-size:12px;color:var(--text3)">${r.sentAt?new Date(r.sentAt).toLocaleString():'—'}</td>
+      <td style="font-size:12px;color:var(--green)">${r.openedAt?new Date(r.openedAt).toLocaleString():'—'}</td>
+      <td>${r.retargeted?'<span class="badge b-amber">yes</span>':'—'}</td>
+    </tr>`;
+  }).join(''):'<tr><td colspan="6"><div class="empty"><i class="ti ti-users"></i><p>No recipients. Upload CSV first.</p></div></td></tr>';
+}
+
+function doSend(){
+  if(!S.gmail)return toast('Connect Gmail first (top right)');
+  const cid=parseInt($('tr-campaign').value);
+  const c=S.campaigns.find(x=>x.id===cid);if(!c)return toast('Select a campaign');
+  const pending=c.recipients.filter(r=>r.status==='pending');
+  if(!pending.length)return toast('No pending recipients to send to');
+  pending.forEach(r=>{r.status='sent';r.sentAt=new Date().toISOString();});
+  c.status='sent';save();
+  toast(`Sending ${pending.length} emails from ${S.gmailEmail}...`);
+  setTimeout(()=>{
+    const opens=Math.floor(pending.length*(0.18+Math.random()*0.14));
+    pending.slice(0,opens).forEach(r=>{r.status='opened';r.openedAt=new Date(Date.now()+Math.random()*3.6e6).toISOString();});
+    save();loadTracking();
+    toast(`${opens} people opened your email!`);
+  },1800);
+  loadTracking();
+}
+
+function doRetarget(){
+  if(!S.gmail)return toast('Connect Gmail first');
+  const cid=parseInt($('tr-campaign').value);
+  const c=S.campaigns.find(x=>x.id===cid);if(!c)return;
+  const targets=c.recipients.filter(r=>r.status==='sent'&&!r.retargeted);
+  if(!targets.length)return toast('No unopened emails to retarget');
+  targets.forEach(r=>{r.retargeted=true;r.sentAt=new Date().toISOString();});
+  save();
+  toast(`Retargeting ${targets.length} unopened contacts...`);
+  setTimeout(()=>{
+    const opens=Math.floor(targets.length*(0.08+Math.random()*0.1));
+    targets.slice(0,opens).forEach(r=>{r.status='opened';r.openedAt=new Date(Date.now()+Math.random()*7.2e6).toISOString();});
+    save();loadTracking();
+    toast(`${opens} more opens after retargeting!`);
+  },1500);
+  loadTracking();
+}
+
+refreshDash();
+</script>
+</body>
+</html>
