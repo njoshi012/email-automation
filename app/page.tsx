@@ -2,10 +2,9 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { Resend } from 'resend'
 
 export default function Home() {
-  const [campaigns, setCampaigns] = useState([])
+  const [campaigns, setCampaigns] = useState<any[]>([])
   const [showNewCampaign, setShowNewCampaign] = useState(false)
   const [campaignName, setCampaignName] = useState('')
   const [emailSubject, setEmailSubject] = useState('')
@@ -24,7 +23,6 @@ export default function Home() {
       // Read CSV file
       const text = await csvFile.text()
       const lines = text.split('\n')
-      const headers = lines[0].split(',')
       const contacts = lines.slice(1).filter(line => line.trim()).map(line => {
         const values = line.split(',')
         return {

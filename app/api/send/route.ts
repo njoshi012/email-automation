@@ -1,7 +1,7 @@
 import { Resend } from 'resend'
 import { supabase } from '@/lib/supabase'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const resend = new Resend(process.env.RESEND_API_KEY || 'placeholder-key')
 
 export async function POST(request: Request) {
   try {
